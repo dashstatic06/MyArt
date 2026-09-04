@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "gallery-images.js"
 
 permissions:
   contents: write
@@ -16,11 +18,10 @@ jobs:
       - name: Download repository
         uses: actions/checkout@v4
 
-      - name: Generate gallery.json
+      - name: Generate gallery-images.js
         run: |
           python - <<'PY'
           import os
-          import json
 
           extensions = (
               ".jpg",
@@ -39,23 +40,24 @@ jobs:
 
           images.sort()
 
-          data = {
-              "images": images
-          }
+          with open("gallery-images.js", "w", encoding="utf-8") as f:
+              f.write("const images = [\n")
 
-          with open("gallery.json", "w", encoding="utf-8") as f:
-              json.dump(data, f, indent=2)
+              for image in images:
+                  f.write("    " + repr(image) + ",\n")
+
+              f.write("];\n")
 
           print("Gallery updated!")
           print(images)
           PY
 
-      - name: Save gallery.json
+      - name: Save gallery-images.js
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add gallery.json
+          git add gallery-images.js
 
           if git diff --cached --quiet; then
             echo "No changes"
