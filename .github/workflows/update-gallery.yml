@@ -1,0 +1,65 @@
+name: Update Gallery
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-gallery:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Generate gallery.json
+        run: |
+          python - <<'PY'
+          import os
+          import json
+
+          extensions = (
+              ".jpg",
+              ".jpeg",
+              ".png",
+              ".gif",
+              ".webp",
+              ".bmp"
+          )
+
+          images = []
+
+          for filename in os.listdir("."):
+              if filename.lower().endswith(extensions):
+                  images.append(filename)
+
+          images.sort()
+
+          data = {
+              "images": images
+          }
+
+          with open("gallery.json", "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2)
+
+          print("Gallery updated!")
+          print(images)
+          PY
+
+      - name: Save gallery.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add gallery.json
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Update gallery"
+            git push
+          fi
