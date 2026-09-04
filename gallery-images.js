@@ -6,6 +6,8 @@ const images = [
     '298_sin_titulo_20260228005745.jpg',
     'CCTWPPR.png',
     'DALLAS.jpg',
+    'DASHSC.jpg',
     'GOGOGOGO.jpg',
+    'PIXELDASH.png',
     'stay funky.png',
 ];
